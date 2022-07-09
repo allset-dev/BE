@@ -3,7 +3,12 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
 
-import { PORT, MONGOOSE_AUTH } from "../config/env-variables.js";
+import {
+  PORT,
+  MONGOOSE_AUTH,
+  IS_DEV,
+  FE_PROXY,
+} from "../config/env-variables.js";
 import { killPort } from "../config/kill-port.js";
 import routes from "./routes/index.js";
 
@@ -15,9 +20,12 @@ killPort();
 
 const app = express();
 
+if (IS_DEV && FE_PROXY) {
+  app.use(cors({ credentials: true, origin: FE_PROXY }));
+}
+
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors());
 
 app.use("/api", routes);
 
